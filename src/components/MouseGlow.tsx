@@ -1,43 +1,92 @@
 import { useEffect, useState } from "react";
 
 export function MouseGlow() {
-  const [pos, setPos] = useState({ x: -500, y: -500 });
+  const [position, setPosition] = useState({
+    x: -1000,
+    y: -1000,
+  });
+
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    // Only enable on devices with a real pointer (skip mobile/tablet/touch)
     if (typeof window === "undefined") return;
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (!fine) return;
+
+    const supportsPointer =
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    if (!supportsPointer) return;
+
     setEnabled(true);
 
-    let raf = 0;
-    let next = { x: 0, y: 0 };
-    const onMove = (e: MouseEvent) => {
-      next = { x: e.clientX, y: e.clientY };
-      if (!raf) {
-        raf = requestAnimationFrame(() => {
-          setPos(next);
-          raf = 0;
+    let animationFrame = 0;
+    let nextPosition = { x: 0, y: 0 };
+
+    const handleMove = (e: MouseEvent) => {
+      nextPosition = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+
+      if (!animationFrame) {
+        animationFrame = requestAnimationFrame(() => {
+          setPosition(nextPosition);
+          animationFrame = 0;
         });
       }
     };
-    window.addEventListener("mousemove", onMove, { passive: true });
+
+    window.addEventListener("mousemove", handleMove, {
+      passive: true,
+    });
+
     return () => {
-      window.removeEventListener("mousemove", onMove);
-      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove", handleMove);
+
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
     };
   }, []);
 
   if (!enabled) return null;
 
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-0 -z-10 transition-opacity duration-300"
-      style={{
-        background: `radial-gradient(600px circle at ${pos.x}px ${pos.y}px, oklch(0.65 0.22 255 / 0.12), transparent 60%)`,
-      }}
-    />
+    <>
+      {/* Main Glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(
+            500px circle at ${position.x}px ${position.y}px,
+            rgba(0, 170, 255, 0.12),
+            transparent 60%
+          )`,
+        }}
+      />
+
+      {/* Secondary Purple Glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(
+            350px circle at ${position.x}px ${position.y}px,
+            rgba(180, 0, 255, 0.08),
+            transparent 65%
+          )`,
+        }}
+      />
+
+      {/* Center Dot */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed z-50 h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(0,255,255,0.9)]"
+        style={{
+          left: position.x - 6,
+          top: position.y - 6,
+        }}
+      />
+    </>
   );
 }

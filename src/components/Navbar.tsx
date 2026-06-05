@@ -18,71 +18,101 @@ export function Navbar() {
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled ? "py-3" : "py-5"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6">
         <nav
-          className={`flex items-center justify-between rounded-2xl px-4 sm:px-6 py-3 transition-all ${
-            scrolled ? "glass-strong shadow-lg" : "glass"
+          className={`relative flex items-center justify-between rounded-2xl px-4 sm:px-6 py-3 transition-all duration-500 overflow-hidden ${
+            scrolled
+              ? "glass-strong shadow-glow"
+              : "glass border border-white/10"
           }`}
         >
-          <a href="#hero" className="flex items-center gap-2 group">
-            <span className="grid place-items-center h-9 w-9 rounded-lg bg-gradient-primary text-primary-foreground font-display font-bold shadow-glow">
+          {/* Glow Background */}
+          <div className="absolute inset-0 bg-gradient-primary opacity-[0.03] pointer-events-none" />
+
+          {/* Logo */}
+          <a href="#hero" className="flex items-center gap-3 group relative z-10">
+            <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-primary text-primary-foreground font-bold shadow-glow animate-pulse-glow">
               A
-            </span>
-            <span className="hidden sm:block font-display font-semibold tracking-tight">
-              Akshay<span className="gradient-text">.dev</span>
-            </span>
+            </div>
+
+            <div className="hidden sm:block">
+              <div className="font-display text-lg font-bold tracking-tight">
+                Akshay
+                <span className="gradient-text">.AI</span>
+              </div>
+
+              <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                AI Engineer
+              </div>
+            </div>
           </a>
-          <ul className="hidden md:flex items-center gap-1">
-            {links.map((l) => (
-              <li key={l.href}>
+
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex items-center gap-2 relative z-10">
+            {links.map((link) => (
+              <li key={link.href}>
                 <a
-                  href={l.href}
-                  className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-white/5"
+                  href={link.href}
+                  className="px-4 py-2 text-sm rounded-xl text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-300"
                 >
-                  {l.label}
+                  {link.label}
                 </a>
               </li>
             ))}
           </ul>
+
+          {/* CTA */}
           <a
             href="#contact"
-            className="hidden md:inline-flex items-center rounded-lg bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition shadow-glow"
+            className="hidden md:inline-flex items-center rounded-xl bg-gradient-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow hover:scale-105 transition-all duration-300 relative z-10"
           >
             Hire Me
           </a>
+
+          {/* Mobile Button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-white/5"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setOpen(!open)}
+            className="md:hidden relative z-10 p-2 rounded-lg hover:bg-white/5 transition"
             aria-label="Toggle menu"
           >
-            {open ? <X size={20} /> : <Menu size={20} />}
+            {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </nav>
 
+        {/* Mobile Menu */}
         {open && (
           <div className="md:hidden mt-2 glass-strong rounded-2xl p-4 animate-fade-in">
-            <ul className="flex flex-col gap-1">
-              {links.map((l) => (
-                <li key={l.href}>
+            <ul className="flex flex-col gap-2">
+              {links.map((link) => (
+                <li key={link.href}>
                   <a
-                    href={l.href}
+                    href={link.href}
                     onClick={() => setOpen(false)}
-                    className="block px-3 py-2 rounded-lg text-sm hover:bg-white/5"
+                    className="block px-4 py-3 rounded-xl hover:bg-white/5 transition"
                   >
-                    {l.label}
+                    {link.label}
                   </a>
                 </li>
               ))}
             </ul>
+
+            <a
+              href="#contact"
+              onClick={() => setOpen(false)}
+              className="mt-3 flex justify-center rounded-xl bg-gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-glow"
+            >
+              Hire Me
+            </a>
           </div>
         )}
       </div>
